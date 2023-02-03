@@ -36,7 +36,6 @@ class Login extends React.Component {
 
   render() {
     const { email, password } = this.state;
-    console.log(email, password);
     return (
       <div>
         <label htmlFor="userMail">
