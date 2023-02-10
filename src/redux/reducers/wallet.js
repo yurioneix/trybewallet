@@ -9,7 +9,6 @@ const INITIAL_STATE = {
 };
 
 const wallet = (state = INITIAL_STATE, action) => {
-  console.log(action);
   switch (action.type) {
   case SEND_CURRENCIES:
     return {
