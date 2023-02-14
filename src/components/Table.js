@@ -1,59 +1,74 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { deleteExpenses } from '../redux/actions';
 
 class Table extends Component {
+  handleClick = (id) => {
+    const { dispatch, expenses } = this.props;
+    console.log(expenses);
+    dispatch(deleteExpenses(expenses, id));
+    console.log(expenses);
+  };
+
   render() {
     const { expenses } = this.props;
-    // const exchangeInfo = expenses
-    //   .map((expense) => expense.exchangeRates[expense.currency]);
-    // console.log(exchangeInfo[0]);
-    const expense1 = expenses.map((expense) => expense);
-    // console.log('Expense', expense1);
-
-    // const expenseInfo = expenses.map((expense) => expense);
-    // console.log(expenseInfo);
+    const expenseTable = expenses.map((expense) => expense);
     return (
       <div>
         <table>
-          <tr>
-            <th>Descrição</th>
-            <th>Tag</th>
-            <th>Método de pagamento</th>
-            <th>Valor</th>
-            <th>Moeda</th>
-            <th>Câmbio utilizado</th>
-            <th>Valor convertido</th>
-            <th>Moeda de conversão</th>
-            <th>Editar/Excluir</th>
-          </tr>
-          {
-            expense1.map((expense) => (
-              <tbody key={ expense1.code }>
-                <tr key={ expense1.code }>
-                  <td key={ expense1.code }>{expense.description}</td>
-                  <td key={ expense1.code }>{expense.tag}</td>
-                  <td key={ expense1.code }>{expense.method}</td>
-                  <td key={ expense1.code }>{Number(expense.value).toFixed(2)}</td>
-                  <td key={ expense1.code }>
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Tag</th>
+              <th>Método de pagamento</th>
+              <th>Valor</th>
+              <th>Moeda</th>
+              <th>Câmbio utilizado</th>
+              <th>Valor convertido</th>
+              <th>Moeda de conversão</th>
+              <th>Editar/Excluir</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {
+              expenseTable.map((expense) => (
+              // <tbody key={ expenseTable.code }>
+                <tr key={ expense.id }>
+                  <td key={ expense.id }>{expense.description}</td>
+                  <td key={ expense.id }>{expense.tag}</td>
+                  <td key={ expense.id }>{expense.method}</td>
+                  <td key={ expense.id }>{Number(expense.value).toFixed(2)}</td>
+                  <td key={ expense.id }>
                     {expense.exchangeRates[expense.currency].name}
                   </td>
-                  <td key={ expense1.code }>
+                  <td key={ expense.id }>
                     {Number(expense.exchangeRates[expense.currency].ask).toFixed(2)}
                   </td>
-                  <td key={ expense1.code }>
+                  <td key={ expense.id }>
                     {
                       Number(
                         expense.value * expense.exchangeRates[expense.currency].ask,
                       ).toFixed(2)
                     }
                   </td>
-                  <td key={ expense1.code }>Real</td>
-                  <td key={ expense1.code }>Editar/Excluir</td>
+                  <td key={ expense.id }>Real</td>
+                  <td key={ expense.id }>
+                    <button
+                      data-testid="delete-btn"
+                      onClick={ () => this.handleClick(expense.id) }
+                      key={ expense.id }
+                    >
+                      Excluir
+
+                    </button>
+                  </td>
                 </tr>
-              </tbody>
-            ))
-          }
+              // </tbody>
+              ))
+            }
+          </tbody>
         </table>
 
       </div>
@@ -75,6 +90,7 @@ Table.propTypes = {
     tag: PropTypes.string.isRequired,
     exchangeRates: PropTypes.shape().isRequired,
   })).isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps)(Table);
