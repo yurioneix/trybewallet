@@ -38,12 +38,23 @@ const wallet = (state = INITIAL_STATE, action) => {
     };
   }
   case SAVE_EDITED_EXPENSES: {
-    // const { expenses, idToEdit } = state;
-    // const filterExpenseToEdit = expenses.filter((expense) => expense.id === idToEdit);
-    // console.log(filterExpenseToEdit);
+    const { expenses } = state;
+    console.log(action.expenses);
+    const filterExpenseToEdit = expenses.map(
+      (expense) => {
+        if (expense.id === action.expenses.id) {
+          return {
+            ...expense,
+            ...action.expenses,
+          };
+        }
+        return expense;
+      },
+    );
+    console.log(filterExpenseToEdit);
     return {
       ...state,
-      expenses: [action.expenses],
+      expenses: filterExpenseToEdit,
       editor: false,
     };
   }
