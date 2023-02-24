@@ -39,7 +39,6 @@ class Login extends React.Component {
     return (
       <div>
         <label htmlFor="userMail">
-          {' '}
           Email:
           <input
             type="email"
@@ -50,6 +49,7 @@ class Login extends React.Component {
             data-testid="email-input"
           />
           <label htmlFor="userPassword">
+            Senha:
             <input
               type="password"
               id="userPassword"

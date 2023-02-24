@@ -1,5 +1,7 @@
 // Esse reducer será responsável por tratar o todas as informações relacionadas as despesas
-import { DELETE_EXPENSES, SAVE_EXPENSES, SEND_CURRENCIES } from '../actions';
+import {
+  DELETE_EXPENSES, EDIT_EXPENSES, SAVE_EDITED_EXPENSES, SAVE_EXPENSES, SEND_CURRENCIES,
+} from '../actions';
 
 const INITIAL_STATE = {
   currencies: [], // array de string
@@ -26,6 +28,23 @@ const wallet = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       expenses: filteredExpenses,
+    };
+  }
+  case EDIT_EXPENSES: {
+    return {
+      ...state,
+      editor: true,
+      idToEdit: action.id,
+    };
+  }
+  case SAVE_EDITED_EXPENSES: {
+    // const { expenses, idToEdit } = state;
+    // const filterExpenseToEdit = expenses.filter((expense) => expense.id === idToEdit);
+    // console.log(filterExpenseToEdit);
+    return {
+      ...state,
+      expenses: [action.expenses],
+      editor: false,
     };
   }
   default:

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { fetchCurrencies, fetchExchanges, saveExpenses } from '../redux/actions';
+import {
+  fetchCurrencies, fetchExchanges, saveEditedExpenses, saveExpenses,
+} from '../redux/actions';
 
 class WalletForm extends Component {
   state = {
@@ -45,8 +47,14 @@ class WalletForm extends Component {
     });
   };
 
+  handleEditExpenses = () => {
+    const { dispatch } = this.props;
+
+    dispatch(saveEditedExpenses({ ...this.state }));
+  };
+
   render() {
-    const { currencies } = this.props;
+    const { currencies, editor } = this.props;
     const { value, description } = this.state;
     return (
       <div>
@@ -116,13 +124,24 @@ class WalletForm extends Component {
             value={ description }
           />
         </label>
-        <button
-          type="button"
-          onClick={ this.onClick }
-        >
-          Adicionar despesa
+        { editor ? (
+          <button
+            type="button"
+            onClick={ this.handleEditExpenses }
+          >
+            Editar despesa
 
-        </button>
+          </button>
+
+        ) : (
+          <button
+            type="button"
+            onClick={ this.onClick }
+          >
+            Adicionar despesa
+
+          </button>
+        )}
       </div>
     );
   }
@@ -130,11 +149,13 @@ class WalletForm extends Component {
 
 const mapStateToProps = (state) => ({
   currencies: state.wallet.currencies,
+  editor: state.wallet.editor,
 });
 
 WalletForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   currencies: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  editor: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps)(WalletForm);
