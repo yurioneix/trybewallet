@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { renderWithRouterAndRedux } from './helpers/renderWith';
+import { renderWithRouterAndRedux, renderWithRedux } from './helpers/renderWith';
 import Wallet from '../pages/Wallet';
 
 const mockData = {
@@ -32,10 +32,10 @@ describe('Testa página Wallet', () => {
     expect(totalParagraph).toHaveTextContent('0.00');
     expect(currencyParagraph).toHaveTextContent('BRL');
   });
+
   it('Testa se ao adicionar uma despesa, o valor total das despesas muda no Header', async () => {
     const { store } = renderWithRouterAndRedux(<Wallet />);
 
-    // const totalParagraph = screen.getByTestId('total-field');
     const valueInput = screen.getByTestId('value-input');
     const currencyInput = screen.getByTestId('currency-input');
     const methodInput = screen.getByTestId('method-input');
@@ -53,12 +53,14 @@ describe('Testa página Wallet', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
+
+    userEvent.type(valueInput, '10');
+    userEvent.selectOptions(methodInput, ['Cartão de crédito']);
+    userEvent.selectOptions(tagInput, ['Lazer']);
+    userEvent.type(descriptionInput, 'Skin no lol2');
+
     await waitFor(() => {
-      userEvent.type(valueInput, '10');
       userEvent.selectOptions(currencyInput, ['USD']);
-      userEvent.selectOptions(methodInput, ['Cartão de crédito']);
-      userEvent.selectOptions(tagInput, ['Lazer']);
-      userEvent.type(descriptionInput, 'Skin no lol2');
       userEvent.click(addExpensesButton);
     });
 
@@ -67,64 +69,89 @@ describe('Testa página Wallet', () => {
       console.log(store.getState().wallet.expenses);
     });
 
-    const valueExpense = screen.getByText('52,09');
-    const currencyExpense = screen.getByText('USD');
-    const methodExpense = screen.getByText('Cartão de Crédito');
-    const tagExpense = screen.getByText('Lazer');
-    const descriptionExpense = screen.getByText('Skin no lol');
+    const valueExpense = screen.getByRole('cell', { name: '52.02' });
+    const currencyExpense = screen.getByRole('cell', { name: 'Dólar Americano/Real Brasileiro' });
+    const methodExpense = screen.getByRole('cell', { name: 'Cartão de crédito' });
+    const tagExpense = screen.getByRole('cell', { name: 'Lazer' });
+    const descriptionExpense = screen.getByRole('cell', { name: 'Skin no lol2' });
 
     expect(valueExpense).toBeInTheDocument();
     expect(currencyExpense).toBeInTheDocument();
     expect(methodExpense).toBeInTheDocument();
     expect(tagExpense).toBeInTheDocument();
     expect(descriptionExpense).toBeInTheDocument();
-
-    // await waitFor(() => {
-    //   expect(totalParagraph).toHaveTextContent('52.09');
-    // });
-    // expect(store.getState().wallet.expenses).toEqual(50);
   });
-  // it('Testa se ao adicionar uma despesa, ela aparece na tabela', async () => {
-  //   const { store } = renderWithRouterAndRedux(<Wallet />);
 
-  //   const valueInput = screen.getByTestId('value-input');
-  //   const currencyInput = screen.getByTestId('currency-input');
-  //   const methodInput = screen.getByTestId('method-input');
-  //   const tagInput = screen.getByTestId('tag-input');
-  //   const descriptionInput = screen.getByTestId('description-input');
-  //   const addExpensesButton = screen.getByText('Adicionar despesa');
+  it('Testa se ao ter uma despesa adicionada, é possível editá-la e removê-la', async () => {
+    const initialState = {
+      wallet: {
+        expenses: [
+          {
+            id: 0,
+            value: '1',
+            description: 'Betano',
+            currency: 'USD',
+            method: 'Dinheiro',
+            tag: 'Trabalho',
+            exchangeRates: { USD: [Object] },
+          },
+        ],
+      },
+    };
 
-  //   expect(valueInput).toBeInTheDocument();
-  //   expect(currencyInput).toBeInTheDocument();
-  //   expect(methodInput).toBeInTheDocument();
-  //   expect(tagInput).toBeInTheDocument();
-  //   expect(descriptionInput).toBeInTheDocument();
-  //   expect(addExpensesButton).toBeInTheDocument();
+    const { store } = renderWithRedux(<Wallet />, { initialState });
 
-  //   await waitFor(() => {
-  //     expect(global.fetch).toHaveBeenCalledTimes(1);
-  //   });
-  //   await waitFor(() => {
-  //     userEvent.type(valueInput, '10');
-  //     userEvent.selectOptions(currencyInput, ['USD']);
-  //     userEvent.selectOptions(methodInput, ['Cartão de crédito']);
-  //     userEvent.selectOptions(tagInput, ['Lazer']);
-  //     userEvent.type(descriptionInput, 'Skin no lol');
-  //     userEvent.click(addExpensesButton);
-  //   });
+    const editButton = screen.getByRole('button', { name: 'Editar' });
+    const deleteButton = screen.getByRole('button', { name: 'Excluir' });
 
-  //   await waitFor(() => {
-  //     const valueExpense = screen.getByText('52,09');
-  //     const currencyExpense = screen.getByText('USD');
-  //     const methodExpense = screen.getByText('Cartão de Crédito');
-  //     const tagExpense = screen.getByText('Lazer');
-  //     const descriptionExpense = screen.getByText('Skin no lol');
+    expect(editButton).toBeInTheDocument();
+    expect(deleteButton).toBeInTheDocument();
 
-  //     expect(valueExpense).toBeInTheDocument();
-  //     expect(currencyExpense).toBeInTheDocument();
-  //     expect(methodExpense).toBeInTheDocument();
-  //     expect(tagExpense).toBeInTheDocument();
-  //     expect(descriptionExpense).toBeInTheDocument();
-  //   });
-  // });
+    // userEvent.click(deleteButton);
+
+    // expect(store.getState().wallet.expenses).toHaveLength(0);
+
+    userEvent.click(editButton);
+
+    const valueInput = screen.getByTestId('value-input');
+    const currencyInput = screen.getByTestId('currency-input');
+    const methodInput = screen.getByTestId('method-input');
+    const tagInput = screen.getByTestId('tag-input');
+    const descriptionInput = screen.getByTestId('description-input');
+    const editExpensesButton = screen.getByRole('button', { name: 'Editar despesa' });
+    expect(editExpensesButton).toBeInTheDocument();
+
+    userEvent.type(valueInput, '10');
+    userEvent.selectOptions(methodInput, ['Dinheiro']);
+    userEvent.selectOptions(tagInput, ['Trabalho']);
+    userEvent.type(descriptionInput, 'Bet365');
+
+    await waitFor(() => {
+      userEvent.selectOptions(currencyInput, ['USD']);
+      userEvent.click(editExpensesButton);
+    });
+
+    // const valueExpense = screen.getByRole('cell', { name: '52.02' });
+    // const currencyExpense = screen.getByRole('cell', { name: 'Dólar Americano/Real Brasileiro' });
+    // const methodExpense = screen.getByRole('cell', { name: 'Dinheiro' });
+    // const tagExpense = screen.getByRole('cell', { name: 'Trabalho' });
+    // const descriptionExpense = screen.getByRole('cell', { name: 'Bet365' });
+
+    // expect(valueExpense).toBeInTheDocument();
+    // expect(currencyExpense).toBeInTheDocument();
+    // expect(methodExpense).toBeInTheDocument();
+    // expect(tagExpense).toBeInTheDocument();
+    // expect(descriptionExpense).toBeInTheDocument();
+
+    // expect(store.getState().wallet.expenses).toEqual({
+    //   id: 0,
+    //   value: '10',
+    //   description: 'Bet365',
+    //   currency: 'USD',
+    //   method: 'Dinheiro',
+    //   tag: 'Trabalho',
+    //   exchangeRates: { USD: [Object] },
+    // });
+    expect(store.getState().wallet.idToEdit).toBe(0);
+  });
 });
