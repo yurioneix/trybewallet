@@ -3,23 +3,23 @@
 Neste projeto desenvolvido no módulo de Frontend da Trybe, foi criado uma carteira de controle de gastos com conversor de moedas. 
 Ao utilizar essa aplicação um usuário deverá ser capaz de:
 
-Adicionar, remover e editar um gasto;
-Visualizar uma tabelas com seus gastos;
-Visualizar o total de gastos convertidos para uma moeda de escolha;
+- Adicionar, remover e editar um gasto;
+- Visualizar uma tabelas com seus gastos;
+- Visualizar o total de gastos convertidos para uma moeda de escolha;
 
 Neste projeto, foi exercitado os seguintes conteúdos:
 
-Criar um store Redux em aplicações React
+- Criar um store Redux em aplicações React
 
-Criar reducers no Redux em aplicações React
+- Criar reducers no Redux em aplicações React
 
-Criar actions no Redux em aplicações React
+- Criar actions no Redux em aplicações React
 
-Criar dispatchers no Redux em aplicações React
+- Criar dispatchers no Redux em aplicações React
 
-Conectar Redux aos componentes React
+- Conectar Redux aos componentes React
 
-Criar actions assíncronas na sua aplicação React que faz uso de Redux.
+- Criar actions assíncronas na sua aplicação React que faz uso de Redux.
 
 ## Instalação
 
